@@ -12,6 +12,7 @@ setupDWM() {
                 NM_PACKAGE="networkmanager-iwd"
             fi
             "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 git unzip flameshot nwg-look feh mate-polkit alsa-utils ghostty rofi xclip xarchiver thunar tumbler tldr gvfs thunar-archive-plugin dunst feh nwg-look dex xscreensaver xorg-xprop polybar picom xdg-user-dirs xdg-desktop-portal-gtk pipewire pavucontrol gnome-keyring flatpak "$NM_PACKAGE" network-manager-applet
+            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb git unzip flameshot nwg-look feh mate-polkit alsa-utils ghostty rofi xclip xarchiver thunar tumbler tldr gvfs thunar-archive-plugin dunst dex xscreensaver xorg-xprop xorg-xrandr xorg-xsetroot xorg-xset polybar picom xdg-user-dirs xdg-desktop-portal-gtk pipewire pavucontrol gnome-keyring flatpak networkmanager network-manager-applet noto-fonts-emoji
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -74,6 +75,15 @@ clone_config_folders() {
     [ ! -d ~/.local/bin ] && mkdir -p ~/.local/bin
     # Copy scripts to local bin
     cp -rf "$HOME/.local/share/dwm-titus/scripts/." "$HOME/.local/bin/"
+
+    # Install Polybar icon fonts (MaterialIcons, Feather)
+    FONT_DIR="$HOME/.local/share/fonts"
+    mkdir -p "$FONT_DIR"
+    if [ -d "$HOME/.local/share/dwm-titus/polybar/fonts" ]; then
+        cp -r "$HOME/.local/share/dwm-titus/polybar/fonts/"* "$FONT_DIR/"
+        fc-cache -fv
+        printf "%b\n" "${GREEN}Polybar icon fonts installed${RC}"
+    fi
 
     # Iterate over all directories in config/*
     for dir in config/*/; do
