@@ -1,5 +1,6 @@
 #!/bin/sh -e
 
+# shellcheck source=core/tabs/common-script.sh
 . ../common-script.sh
 
 installLinutil() {
@@ -35,7 +36,7 @@ installLinutil() {
             read -r choice
             case $choice in
                 y | Y)
-                    if ! command_exists cargo; then
+                    if ! command -v cargo >/dev/null 2>&1; then
                         printf "%b\n" "${YELLOW}Installing rustup...${RC}"
                         case "$PACKAGER" in
                             dnf)

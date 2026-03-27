@@ -102,7 +102,7 @@ select_option() {
                         ;;
                     '[B') # Down arrow
                         ((selected++))
-                        if [ $selected -ge $num_options ]; then
+                        if [ "$selected" -ge "$num_options" ]; then
                             selected=0
                         fi
                         ;;
@@ -508,14 +508,15 @@ pacman -S --noconfirm --needed pacman-contrib curl terminus-font
 pacman -S --noconfirm --needed reflector rsync grub arch-install-scripts git ntp wget
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
 
-nc=$(grep -c ^"cpu cores" /proc/cpuinfo)
-echo -ne "
--------------------------------------------------------------------------
-                    You have " $nc" cores. And
-            changing the makeflags for " $nc" cores. Aswell as
-                changing the compression settings.
--------------------------------------------------------------------------
-"
+# shellcheck disable=SC2154
+nc="$(grep -c '^cpu cores' /proc/cpuinfo)"
+# shellcheck disable=SC2154
+printf "%s\n%s\n%s\n%s\n%s\n" \
+"-------------------------------------------------------------------------" \
+"                    You have ${nc:-0} cores. And" \
+"            changing the makeflags for ${nc:-0} cores. Aswell as" \
+"                changing the compression settings." \
+"-------------------------------------------------------------------------"
 TOTAL_MEM=$(cat /proc/meminfo | grep -i 'memtotal' | grep -o '[[:digit:]]*')
 if [[  $TOTAL_MEM -gt 8000000 ]]; then
 sed -i "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$nc\"/g" /etc/makepkg.conf
