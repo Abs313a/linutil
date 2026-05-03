@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 
 . ../common-script.sh
 . ../common-service-script.sh
@@ -7,7 +7,13 @@ setupDWM() {
     printf "%b\n" "${YELLOW}Installing DWM-Titus...${RC}"
     case "$PACKAGER" in # Install pre-Requisites
         pacman)
-            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb git unzip flameshot nwg-look feh mate-polkit alsa-utils ghostty rofi xclip xarchiver thunar tumbler tldr gvfs thunar-archive-plugin dunst dex xscreensaver xorg-xprop xorg-xrandr xorg-xsetroot xorg-xset polybar picom xdg-user-dirs xdg-desktop-portal-gtk pipewire pavucontrol gnome-keyring flatpak networkmanager network-manager-applet noto-fonts-emoji
+            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm \
+                base-devel libx11 libxinerama libxft imlib2 libxcb xcb-util freetype2 fontconfig \
+                git unzip flameshot nwg-look feh mate-polkit alsa-utils ghostty rofi xclip xarchiver \
+                thunar tumbler tldr gvfs thunar-archive-plugin dunst dex xscreensaver xorg-xprop \
+                xorg-xrandr xorg-xsetroot xorg-xset polybar picom xdg-user-dirs xdg-desktop-portal-gtk \
+                xdg-utils pipewire wireplumber pavucontrol gnome-keyring flatpak networkmanager \
+                network-manager-applet noto-fonts-emoji brightnessctl xdotool libnotify
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -19,13 +25,13 @@ setupDWM() {
 makeDWM() {
     [ ! -d "$HOME/.local/share" ] && mkdir -p "$HOME/.local/share/"
     if [ ! -d "$HOME/.local/share/dwm-titus" ]; then
-	printf "%b\n" "${YELLOW}DWM-Titus not found, cloning repository...${RC}"
-	cd "$HOME/.local/share/" && git clone https://github.com/ChrisTitusTech/dwm-titus.git # CD to Home directory to install dwm-titus This path can be changed (e.g. to linux-toolbox directory)
-	cd dwm-titus/ # Hardcoded path, maybe not the best.
+        printf "%b\n" "${YELLOW}DWM-Titus not found, cloning repository...${RC}"
+        git clone https://github.com/ChrisTitusTech/dwm-titus.git "$HOME/.local/share/dwm-titus"
     else
-	printf "%b\n" "${GREEN}DWM-Titus directory already exists, replacing..${RC}"
-	cd "$HOME/.local/share/dwm-titus" && git pull
+        printf "%b\n" "${GREEN}DWM-Titus directory already exists, replacing..${RC}"
+        git -C "$HOME/.local/share/dwm-titus" pull
     fi
+    cd "$HOME/.local/share/dwm-titus"
     "$ESCALATION_TOOL" make clean install # Run make clean install
 }
 
@@ -50,49 +56,18 @@ install_nerd_font() {
             return 1
         }
     fi
-        printf "%b\n" "${YELLOW}Installing font '$FONT_NAME'${RC}"
-        # Change this URL to correspond with the correct font
-        FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip"
-        FONT_DIR="$HOME/.local/share/fonts"
-        TEMP_DIR=$(mktemp -d)
-        curl -sSLo "$TEMP_DIR"/"${FONT_NAME}".zip "$FONT_URL"
-        unzip "$TEMP_DIR"/"${FONT_NAME}".zip -d "$TEMP_DIR"
-        mkdir -p "$FONT_DIR"/"$FONT_NAME"
-        mv "${TEMP_DIR}"/*.ttf "$FONT_DIR"/"$FONT_NAME"
-        fc-cache -fv
-        rm -rf "${TEMP_DIR}"
-        printf "%b\n" "${GREEN}'$FONT_NAME' installed successfully.${RC}"
-}
-
-clone_config_folders() {
-    # Ensure the target directory exists
-    [ ! -d ~/.config ] && mkdir -p ~/.config
-    [ ! -d ~/.local/bin ] && mkdir -p ~/.local/bin
-    # Copy scripts to local bin
-    cp -rf "$HOME/.local/share/dwm-titus/scripts/." "$HOME/.local/bin/"
-
-    # Install Polybar icon fonts (MaterialIcons, Feather)
+    printf "%b\n" "${YELLOW}Installing font '$FONT_NAME'${RC}"
+    # Change this URL to correspond with the correct font
+    FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip"
     FONT_DIR="$HOME/.local/share/fonts"
-    mkdir -p "$FONT_DIR"
-    if [ -d "$HOME/.local/share/dwm-titus/polybar/fonts" ]; then
-        cp -r "$HOME/.local/share/dwm-titus/polybar/fonts/"* "$FONT_DIR/"
-        fc-cache -fv
-        printf "%b\n" "${GREEN}Polybar icon fonts installed${RC}"
-    fi
-
-    # Iterate over all directories in config/*
-    for dir in config/*/; do
-        # Extract the directory name
-        dir_name=$(basename "$dir")
-
-        # Clone the directory to ~/.config/
-        if [ -d "$dir" ]; then
-            cp -r "$dir" ~/.config/
-            printf "%b\n" "${GREEN}Cloned $dir_name to ~/.config/${RC}"
-        else
-            printf "%b\n" "${RED}Directory $dir_name does not exist, skipping${RC}"
-        fi
-    done
+    TEMP_DIR=$(mktemp -d)
+    curl -sSLo "$TEMP_DIR"/"${FONT_NAME}".zip "$FONT_URL"
+    unzip "$TEMP_DIR"/"${FONT_NAME}".zip -d "$TEMP_DIR"
+    mkdir -p "$FONT_DIR"/"$FONT_NAME"
+    mv "${TEMP_DIR}"/*.ttf "$FONT_DIR"/"$FONT_NAME"
+    fc-cache -fv
+    rm -rf "${TEMP_DIR}"
+    printf "%b\n" "${GREEN}'$FONT_NAME' installed successfully.${RC}"
 }
 
 configure_backgrounds() {
@@ -106,7 +81,7 @@ configure_backgrounds() {
     if [ ! -d "$PIC_DIR" ]; then
         # If it doesn't exist, print an error message and return with a status of 1 (indicating failure)
         printf "%b\n" "${RED}Pictures directory does not exist${RC}"
-        mkdir ~/Pictures
+        mkdir "$PIC_DIR"
         printf "%b\n" "${GREEN}Directory was created in Home folder${RC}"
     fi
 
@@ -119,7 +94,7 @@ configure_backgrounds() {
             return 1
         fi
         # Print a success message indicating that the backgrounds have been downloaded
-        printf "%b\n" "${GREEN}Downloaded desktop backgrounds to $BG_DIR${RC}"    
+        printf "%b\n" "${GREEN}Downloaded desktop backgrounds to $BG_DIR${RC}"
     else
         # If the backgrounds directory already exists, print a message indicating that the download is being skipped
         printf "%b\n" "${GREEN}Path $BG_DIR exists for desktop backgrounds, skipping download of backgrounds${RC}"
@@ -148,16 +123,11 @@ setupDisplayManager() {
     done
     printf "%b\n" "${GREEN}Display Manager Setup: $currentdm${RC}"
     if [ "$currentdm" = "none" ]; then
-        printf "%b\n" "${YELLOW}--------------------------${RC}" 
+        printf "%b\n" "${YELLOW}--------------------------${RC}"
         DM="sddm"
         case "$PACKAGER" in
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm "$DM"
-                if [ "$DM" = "lightdm" ]; then
-                    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm lightdm-gtk-greeter
-                elif [ "$DM" = "sddm" ]; then
-                    sh -c "$(curl -fsSL https://raw.githubusercontent.com/keyitdev/sddm-astronaut-theme/master/setup.sh)"
-                fi
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
@@ -166,7 +136,7 @@ setupDisplayManager() {
         esac
         printf "%b\n" "${GREEN}$DM installed successfully${RC}"
         enableService "$DM"
-        
+
     fi
 }
 
@@ -176,5 +146,4 @@ setupDisplayManager
 setupDWM
 makeDWM
 install_nerd_font
-clone_config_folders
 configure_backgrounds
