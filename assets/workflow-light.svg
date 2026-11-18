@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="130" viewBox="0 0 960 130" role="img" aria-labelledby="title desc">
+  <title id="title">Find it. Inspect it. Run it.</title>
+  <desc id="desc">Search with /, preview the exact script with p, and press Enter to confirm and run.</desc>
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+  <g transform="translate(1,1)">
+    <rect width="302" height="124" rx="16" fill="#f6f8fc" stroke="#d4deed"/>
+    <path d="M20 0H282" stroke="#055bda" stroke-width="2"/>
+    <text x="151" text-anchor="middle" y="36" fill="#055bda" font-size="15" letter-spacing="2">FIND YOUR TASK</text>
+    <rect x="127" y="58" width="48" height="42" rx="8" fill="#e0edff" stroke="#d4deed"/>
+    <text x="151" y="85" text-anchor="middle" font-family="monospace" font-size="22" font-weight="700" fill="#055bda">/</text>
+  </g>
+  <g transform="translate(329,1)">
+    <rect width="302" height="124" rx="16" fill="#f6f8fc" stroke="#d4deed"/>
+    <path d="M20 0H282" stroke="#055bda" stroke-width="2"/>
+    <text x="151" text-anchor="middle" y="36" fill="#055bda" font-size="15" letter-spacing="2">READ THE SCRIPT</text>
+    <rect x="127" y="58" width="48" height="42" rx="8" fill="#e0edff" stroke="#d4deed"/>
+    <text x="151" y="85" text-anchor="middle" font-family="monospace" font-size="22" font-weight="700" fill="#055bda">p</text>
+  </g>
+  <g transform="translate(657,1)">
+    <rect width="302" height="124" rx="16" fill="#f6f8fc" stroke="#d4deed"/>
+    <path d="M20 0H282" stroke="#055bda" stroke-width="2"/>
+    <text x="151" text-anchor="middle" y="36" fill="#055bda" font-size="15" letter-spacing="2">MAKE IT HAPPEN</text>
+    <rect x="105.5" y="58" width="91" height="42" rx="8" fill="#e0edff" stroke="#d4deed"/>
+    <text x="151" y="85" text-anchor="middle" font-family="monospace" font-size="22" font-weight="700" fill="#055bda">Enter</text>
+  </g>
+  </g>
+</svg>
